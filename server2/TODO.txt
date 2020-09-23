@@ -1,0 +1,6 @@
+TODO:
+
+Allt ska vara inom payload, när man emittar,
+kosntigt fel när man tar bort den sista chatten ??
+
+Sen resten... Du är djur.
