@@ -20,7 +20,6 @@ class UserService {
 	init() {
 		const eventBus = new Subject();
 		eventBus.subscribe((message) => {
-			console.log(message);
 			if (message.type !== 'error') {
 				this.io.to(message.target).emit(message.responseMessage, {
 					type: message.payload.type,

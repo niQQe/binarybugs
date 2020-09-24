@@ -1,21 +1,29 @@
 import Vue from 'vue';
 import Dashboard from '@/components/Dashboard';
 import Login from '@/components/Login';
+import Home from '@/views/Home';
 import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
 const routes = [
 	{
-		path: '/',
+		path: '/login',
 		name: 'Login',
 		component: Login,
 	},
 	{
-		path: '/dashboard',
-		name: 'Dashboard',
-		component: Dashboard,
-	}
+		path: '/',
+		name: 'Home',
+		component: Home,
+		children: [
+			{
+				name: 'Dashboard',
+				path: '',
+				component: Dashboard,
+			},
+		],
+	},
 ];
 
 const router = new VueRouter({

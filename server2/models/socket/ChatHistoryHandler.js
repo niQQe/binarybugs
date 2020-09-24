@@ -8,11 +8,12 @@ class ChatHistoryHandler {
 		this._id = _id;
 	}
 	async handle(message) {
+        console.log(this._id)
 		try{
             await this.collections[message.payload.collection]
                 .find({ fromId: { $in: [this._id, message.payload.toId] }, toId: { $in: [this._id, message.payload.toId] } })
                 .exec((err, res ) => {
-                    console.log(res)
+                    message.payload.fromId = this._id
                     if(!err){
                         this.eventBus.next({
                             ...new EventMessage({ res, message })
