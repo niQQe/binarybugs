@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Dashboard from '@/components/Dashboard';
+import Dashboard from '@/views/Dashboard';
 import Login from '@/components/Login';
 import Home from '@/views/Home';
 import VueRouter from 'vue-router';

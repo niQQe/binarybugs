@@ -8,25 +8,8 @@
                 :class="{ offline: !user.online }"
             >
                 <!-- <div class="user-container" @click="sendNotification(user._id, user.fullname) -->
-                <div
-                    class="user-icon"
-                    style="
-                        background: #f3c442;
-                        width: 33px;
-                        height: 33px;
-                        float: left;
-                        border-radius: 50%;
-                        display: flex;
-                    "
-                >
-                    <span
-                        class="mdi mdi-ladybug"
-                        style="
-                            margin: auto;
-                            font-size: 1.5em;
-                            color: rgb(47 49 54);
-                        "
-                    ></span>
+                <div class="user-icon">
+                    <span class="mdi mdi-ladybug"></span>
                 </div>
                 <span
                     class="user"
@@ -39,8 +22,7 @@
     </div>
 </template>
 <script>
-
-import { bus } from '@/main'
+import { bus } from "@/main";
 export default {
     name: "Users",
     props: {
@@ -58,9 +40,8 @@ export default {
                 collection: "User",
             },
         });
-        this.socket.on("ALL_USERS", (message) => {
-            console.log(message);
-            this.allUsers = message.payload.data.filter(
+        this.socket.on("ALL_USERS", ({ payload }) => {
+            this.allUsers = payload.data.filter(
                 (user) => user._id != this.userId
             );
         });
@@ -81,9 +62,8 @@ export default {
         });
     },
     methods: {
-        
         activateChat(name, id) {
-            bus.$emit('newActiveChat', name, id)
+            bus.$emit("newActiveChat", name, id);
         },
         sendNotification(id, fullname) {
             this.socket.emit("NEW_NOTIFICATION", {
@@ -102,10 +82,11 @@ export default {
     position: fixed;
     right: 0px;
     padding: 10px;
-    top:0px;
+    top: 0px;
     z-index: 2;
     height: 100%;
-    background: #2f3136;
+    background: #242526;
+    box-shadow: -1px 0px 10px #00000087;
     .header {
         font-weight: 700;
         color: #b0b3b8;
@@ -125,6 +106,20 @@ export default {
         transition: all 0.2s ease;
         position: relative;
         cursor: pointer;
+        .user-icon {
+            background: rgba(57, 182, 255, 0.233);
+            width: 33px;
+            height: 33px;
+            float: left;
+            border-radius: 50%;
+            display: flex;
+            color: #fff;
+            span {
+                margin: auto;
+                font-size: 1.5em;
+                color: rgb(57, 182, 255);
+            }
+        }
         &.offline {
             opacity: 0.5;
         }

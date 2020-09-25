@@ -79,49 +79,48 @@ export default {
     },
     data: () => ({
         activeChats: [],
-	}),
-	watch:{
-		userId(v){
-			console.log(v)
-		}
-	},
+    }),
+    watch: {
+        userId(v) {
+            console.log(v);
+        },
+    },
     mounted() {
-		console.log(this.userId)
+        console.log(this.userId);
         bus.$on("newActiveChat", (...args) => {
             const [name, id] = args;
             this.activateChat(name, id);
         });
-        this.socket.on("NEW_CHAT_MESSAGE", (message) => {
-            console.log(message);
+        this.socket.on("NEW_CHAT_MESSAGE", ({ payload }) => {
             //** CHECK IF CHAT EXISTS */
             const MERGE_IDS = (fromId, toId) => [fromId, toId].sort().join``;
 
             const INC_IDS = MERGE_IDS(
-                message.payload.data.fromId,
-                message.payload.data.toId
+                payload.data.fromId,
+                payload.data.toId
             );
 
             if (this.activeChats.length > 0) {
                 for (let chat of this.activeChats) {
                     if (MERGE_IDS(chat.toId, chat.fromId) === INC_IDS) {
                         chat.newChatMessage = true;
-                        chat.messages.push(message.payload.data);
+                        chat.messages.push(payload.data);
                     } else {
                         this.activateChat(
-                            message.payload.data.fromFullName,
-                            message.payload.data.fromId
+                            payload.data.fromFullName,
+                            payload.data.fromId
                         );
                     }
                 }
             } else {
                 this.activateChat(
-                    message.payload.data.fromFullName,
-                    message.payload.data.fromId
+                    payload.data.fromFullName,
+                    payload.data.fromId
                 );
             }
         });
         this.socket.on("CHAT_HISTORY", (message) => {
-			console.log(message.recieved)
+            console.log(message.recieved);
             const CHAT_ALREADY_IN_ACTIVE_CHATS = this.activeChats.some(
                 (chat) => chat.toId === message.recieved.toId
             );
@@ -147,6 +146,7 @@ export default {
             if (message.trim().length > 0) {
                 this.socket.emit("request", {
                     type: "new-chat-message",
+                    group:false,
                     payload: {
                         responseMessage: "NEW_CHAT_MESSAGE",
                         toId: id,
@@ -156,9 +156,10 @@ export default {
             }
         },
         activateChat(name, id) {
-			console.log(id)
+            console.log(id);
             this.socket.emit("request", {
                 type: "chat-history",
+                group:false,
                 payload: {
                     toId: id,
                     fromId: this.userId,
@@ -344,20 +345,4 @@ export default {
 }
 
 /* Track */
-::-webkit-scrollbar-track {
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #4d4d4e;
-    border-radius: 10px;
-    margin-right: 5px;
-    right: 5px;
-    transition: all 0.2s ease;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #636364;
-}
 </style>

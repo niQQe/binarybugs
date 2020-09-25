@@ -42,21 +42,20 @@ export default {
     mounted() {
         this.socket.emit("request", {
             type: "find-by-id",
+            group:false,
             payload: {
                 key: "toId",
                 responseMessage: "ALL_USER_NOTIFICATIONS",
                 collection: "Notification",
             },
         });
-        this.socket.on("ALL_USER_NOTIFICATIONS", (message) => {
-            this.notifications = message.payload.data.reverse();
+        this.socket.on("ALL_USER_NOTIFICATIONS", ({ payload }) => {
+            this.notifications = payload.data.reverse();
             this.notifications.forEach((notice) =>
                 !notice.read ? this.newNotices++ : null
             );
         });
         this.socket.on("NEW_NOTIFICATION", (data) => {
-            console.log();
-            console.log(data);
             this.notifications.unshift(data);
             this.newNotices++;
         });
@@ -70,6 +69,7 @@ export default {
             this.currentNotificationIndex = index;
             this.socket.emit("request", {
                 type: "update-one",
+                group:false,
                 payload: {
                     _id: id,
                     key: "read",
@@ -87,13 +87,12 @@ export default {
 #global-notifications-icon {
     color: #ffffff;
     float: right;
-    margin-left: auto;
     position: relative;
     width: 40px;
     height: 40px;
     border-radius: 50%;
     display: flex;
-    background: #3a3b3c;
+    background: #242526;
     cursor: pointer;
     transition: all 0.2s ease;
     &:hover {

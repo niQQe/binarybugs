@@ -4,11 +4,14 @@ const jwt = require('jsonwebtoken');
 const User = require('../schemas/user');
 const Message = require('../schemas/message');
 const Notification = require('../schemas/notification');
+const Project = require('../schemas/project');
+
 const FindAllHandler = require('./FindAllHandler');
 const FindByIdHandler = require('./FindByIdHandler');
 const UpdateOneHandler = require('./UpdateOneHandler');
 const ChatHistoryHandler = require('./ChatHistoryHandler');
 const NewChatMessageHandler = require('./NewChatMessageHandler');
+const SaveOneHandler = require('./SaveOneHandler');
 
 const Handlers = require('./Handlers');
 
@@ -18,24 +21,6 @@ class UserService {
 		this.collections = mongoose.connections[0].collections;
 	}
 	init() {
-		const eventBus = new Subject();
-		eventBus.subscribe((message) => {
-			if (message.type !== 'error') {
-				this.io.to(message.target).emit(message.responseMessage, {
-					type: message.payload.type,
-					status: message.payload.status,
-					payload: message.payload,
-					recieved: message.recieved,
-				});
-			} else {
-				this.io.to(message.target).emit(message.responseMessage, {
-					type: message.type,
-					status: message.status,
-					responseMessage: 'ERROR',
-					errorOutput: message.errorOutput,
-				});
-			}
-		});
 		this.io
 			.use((socket, next) => {
 				if (socket.handshake.query && socket.handshake.query.token) {
@@ -52,7 +37,6 @@ class UserService {
 						 */
 
 						const { fullname, _id } = await User.findOne({ collection: User, _id: decoded.sub });
-
 
 						/**
 						 * 	Set the full name, id and socketUserid in the
@@ -74,6 +58,38 @@ class UserService {
 			})
 			.on('connection', async (socket) => {
 				console.log('user connected');
+
+				const eventBus = new Subject();
+				eventBus.subscribe((message) => {
+					console.log('EVENTBUS SUBSCRIBE');
+					console.log(message);
+					if (message.type !== 'error') {
+						if (message.group) {
+							this.io.to('all').emit(message.responseMessage, {
+								type: message.payload.type,
+								status: message.payload.status,
+								payload: message.payload,
+								recieved: message.recieved,
+							});
+						} else {
+							this.io.to(message.target).emit(message.responseMessage, {
+								type: message.payload.type,
+								status: message.payload.status,
+								payload: message.payload,
+								recieved: message.recieved,
+							});
+						}
+					} else {
+						this.io.to(message.target).emit(message.responseMessage, {
+							type: message.type,
+							status: message.status,
+							responseMessage: 'ERROR',
+							errorOutput: message.errorOutput,
+						});
+					}
+				});
+
+				socket.join('all');
 				/**
 				 * 	Update the the status of the user to online = true in the database.
 				 *  We do this so the initial GET from the user will have the correct status.
@@ -88,11 +104,12 @@ class UserService {
 				this.io.emit('USER_ONLINE', { id: socket.user._id });
 
 				const handlers = new Handlers({
-					[FindAllHandler.TYPE]: new FindAllHandler({ User, Message, Notification }, eventBus),
+					[FindAllHandler.TYPE]: new FindAllHandler({ User, Message, Notification, Project }, eventBus),
 					[FindByIdHandler.TYPE]: new FindByIdHandler({ User, Message, Notification }, eventBus, socket.user._id),
 					[UpdateOneHandler.TYPE]: new UpdateOneHandler({ User, Message, Notification }, eventBus, socket.user._id),
 					[ChatHistoryHandler.TYPE]: new ChatHistoryHandler({ Message }, eventBus, socket.user._id),
 					[NewChatMessageHandler.TYPE]: new NewChatMessageHandler({ Message, User }, eventBus, socket.user._id),
+					[SaveOneHandler.TYPE]: new SaveOneHandler({ Project, User, Notification }, eventBus, socket.user._id),
 				});
 
 				socket.on('request', (message) => {

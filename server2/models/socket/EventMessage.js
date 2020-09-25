@@ -3,6 +3,7 @@ class EventMessage {
 		return {
 			status: 200,
 			responseMessage: message.payload.responseMessage,
+			group:message.group,
 			target: message.socketId,
 			recieved:message.payload,
 			payload: {

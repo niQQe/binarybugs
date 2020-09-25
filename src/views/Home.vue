@@ -3,9 +3,10 @@
         <Nav :email="email" :socket="socket" :userId="userId" v-if="socket" />
         <Users :socket="socket" :userId="userId" />
         <div id="main-router-content">
-            <router-view :key="$route.fullPath"></router-view>
+            <router-view :key="$route.fullPath" :socket="socket"></router-view>
         </div>
         <Chatbar :socket="socket" :userId="userId" />
+        <CreateProject :socket="socket" v-if="createNewProjectDialog" />
     </div>
 </template>
 
@@ -18,25 +19,28 @@ import io from "socket.io-client";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
+import CreateProject from "@/components/Dialogs/Createproject";
+
+import { bus } from "@/main";
+
 export default {
     name: "Home",
     components: {
         Nav,
         Users,
         Chatbar,
+        CreateProject,
     },
     data: () => ({
-        allUsers: [],
-        notifications: [],
-        notificationData: [],
-        socket: null,
-        newNotices: 0,
-        showNotifications: false,
-        userId: "",
-        latestSent: "",
+        createNewProjectDialog: false,
     }),
     mounted() {},
     created() {
+        bus.$on(
+            "show-create-new-project-dialog",
+            this.openCreateNewProjectDialog
+        );
+        bus.$on("close-dialog", this.closeDialog);
         this.userId = JSON.parse(localStorage.getItem("site_info"))._id;
         this.email = JSON.parse(localStorage.getItem("site_info")).email;
         console.log(this.userId);
@@ -48,7 +52,14 @@ export default {
         });
     },
     watch: {},
-    methods: {},
+    methods: {
+        openCreateNewProjectDialog() {
+            this.createNewProjectDialog = !this.createNewProjectDialog;
+        },
+        closeDialog() {
+            this.createNewProjectDialog = false;
+        },
+    },
 };
 </script>
 
@@ -68,14 +79,21 @@ export default {
         float: left;
         width: 100%;
         height: 100%;
-        #content {
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-        }
+        position: relative;
+        padding:20px;
     }
 }
 
+input {
+    background: #18191a !important;
+    border: 1px solid #3b3f44 !important;
+    &:hover {
+        box-shadow: 0 0 0pt 1px rgba(57, 182, 255, 0.445);
+    }
+    &:focus {
+        box-shadow: 0 0 0pt 1px rgb(57, 182, 255);
+    }
+}
 
 ::-webkit-scrollbar-track {
 }
@@ -93,5 +111,4 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
     background: #636364;
 }
-
 </style>
