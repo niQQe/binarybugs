@@ -8,11 +8,16 @@ class SaveOneHandler {
 		this._id = id;
 	}
 	async handle(message) {
+		const fields = Object.keys(this.collections[message.payload.collection].schema.paths)
+			.filter((key) => key != '_id' && key != '__v')
+			.reduce((acc, key) => {
+				acc[key] = message.payload[key];
+				return acc;
+			}, {});
+
 		try {
 			const NEW_DOCUMENT = new this.collections[message.payload.collection]({
-				name: message.payload.name,
-				created: new Date().toISOString(),
-				createdBy: this._id,
+				...fields,
 			});
 
 			await NEW_DOCUMENT.save((err, res) => {

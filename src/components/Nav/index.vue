@@ -1,27 +1,14 @@
 <template>
     <nav>
         <div class="logo">Binary Bugs</div>
-        <div
-            style="
-                width: 40px;
-                height: 40px;
-                border-radius: 40px;
-                background: #242526;
-                margin-left: auto;
-                margin-right: 10px;
-                display: flex;
-            "
-            @click="openCreateNewProjectDialog"
-        >
-            <span
-                class="mdi mdi-plus"
-                style="
-                    font-size: 22px;
-                    color: #fff;
-                    margin: auto;
-                    cursor: pointer;
-                "
-            ></span>
+        <div class="user-container">
+            <div class="user-icon">
+                <span class="mdi mdi-ladybug"></span>
+            </div>
+            <div class="fullname">{{ fullname }}</div>
+        </div>
+        <div class="add-project-btn" @click="openCreateNewProjectDialog">
+            <span class="mdi mdi-plus" style=""></span>
         </div>
         <Notifications :socket="socket" />
     </nav>
@@ -39,7 +26,12 @@ export default {
         email: String,
         socket: Object,
     },
-    data: () => ({}),
+    data: () => ({
+        fullame: "",
+    }),
+    created() {
+        this.fullname = JSON.parse(localStorage.getItem("site_info")).fullname;
+    },
     methods: {
         openCreateNewProjectDialog() {
             bus.$emit("show-create-new-project-dialog");
@@ -51,18 +43,67 @@ export default {
 <style lang="scss" scoped>
 nav {
     width: calc(100% - 260px);
-    height: 60px;
+    height: 70px;
     z-index: 10;
     top: 0px;
     position: fixed;
     display: flex;
     align-items: center;
-    padding: 20px 30px;
-    margin-top: 10px;
+    padding: 0px 30px;
     .logo {
         color: #fff;
         font-size: 1.2em;
         font-weight: 600;
+    }
+
+    .user-container {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        border-radius: 50px;
+        padding: 5px 15px 5px 5px;
+        margin-right: 10px;
+        .user-icon {
+            background: rgb(60,61,62);
+            width: 30px;
+            height: 30px;
+            float: left;
+            border-radius: 50%;
+            display: flex;
+            color: #fff;
+            span {
+                margin: auto;
+                font-size: 1.2em;
+                color: rgb(57, 182, 255);
+            }
+        }
+        .fullname {
+            color: rgba(255, 255, 255, 0.678);
+            margin-left: auto;
+            margin-left: 10px;
+            font-weight:600;
+            font-size:1em;
+        }
+        &:hover {
+            background: #ffffff1a;
+        }
+    }
+    .add-project-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 40px;
+        background: #242526;
+        margin-right: 10px;
+        display: flex;
+        cursor: pointer;
+        &:hover {
+            background: #ffffff31;
+        }
+        span {
+            font-size: 22px;
+            color: #fff;
+            margin: auto;
+        }
     }
 }
 </style>

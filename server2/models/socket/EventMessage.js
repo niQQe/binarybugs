@@ -1,5 +1,7 @@
 class EventMessage {
 	constructor({ res, message }) {
+		console.log('EVENTMESSAGE')
+		console.log(res, message)
 		return {
 			status: 200,
 			responseMessage: message.payload.responseMessage,

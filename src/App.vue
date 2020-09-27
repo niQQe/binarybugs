@@ -41,6 +41,10 @@ html {
     width: 100%;
 }
 
+a{
+    text-decoration: none;
+}
+
 html,
 body {
     margin: 0;

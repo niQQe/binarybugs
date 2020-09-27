@@ -1,11 +1,13 @@
 <template>
-    <div
-        id="global-notifications-icon"
-        @click="showNotifications = !showNotifications"
-    >
-        <i class="material-icons">notifications</i>
-        <div class="notification-dot" v-if="newNotices > 0" style>
-            <span class="notification-counter">{{ newNotices }}</span>
+    <div id="nofications">
+        <div
+            id="global-notifications-icon"
+            @click="showNotifications = !showNotifications"
+        >
+            <i class="material-icons">notifications</i>
+            <div class="notification-dot" v-if="newNotices > 0" style>
+                <span class="notification-counter">{{ newNotices }}</span>
+            </div>
         </div>
         <div v-if="showNotifications" id="notification-dropdown">
             <div class="header">Notifications</div>
@@ -14,21 +16,25 @@
                 :key="index"
                 class="notification"
             >
-                {{ notice.value }} {{ notice.date }}
-                <div v-for="(user, key) in notice.sender" :key="user._id">
-                    {{ key === "fullname" ? user : null }}
+                <span class="name">{{ notice.fromFullName }}</span>
+                <span>{{ notice.value }}</span>
+                <span class="date">{{ getRelativeDate(notice.date) }}</span>
+                <div class="mark-as-read-container">
+                    <span
+                        class="markasread-dot"
+                        v-if="!notice.read"
+                        @click="markAsRead(notice._id, index)"
+                    ></span>
                 </div>
-                <span
-                    class="markasread-dot"
-                    v-if="!notice.read"
-                    @click="markAsRead(notice._id, index)"
-                ></span>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
 export default {
     name: "Notifications",
     props: {
@@ -39,10 +45,17 @@ export default {
         newNotices: 0,
         notifications: null,
     }),
+    watch: {
+        notifications(v) {
+            console.log(v);
+        },
+    },
     mounted() {
+        dayjs.extend(relativeTime);
+
         this.socket.emit("request", {
             type: "find-by-id",
-            group:false,
+            group: false,
             payload: {
                 key: "toId",
                 responseMessage: "ALL_USER_NOTIFICATIONS",
@@ -54,9 +67,10 @@ export default {
             this.notifications.forEach((notice) =>
                 !notice.read ? this.newNotices++ : null
             );
+            console.log(this.notifications);
         });
         this.socket.on("NEW_NOTIFICATION", (data) => {
-            this.notifications.unshift(data);
+            this.notifications.unshift(data.payload.data);
             this.newNotices++;
         });
         this.socket.on("NOTIFICATION_MARKED_AS_READ", (payload) => {
@@ -69,7 +83,7 @@ export default {
             this.currentNotificationIndex = index;
             this.socket.emit("request", {
                 type: "update-one",
-                group:false,
+                group: false,
                 payload: {
                     _id: id,
                     key: "read",
@@ -79,59 +93,66 @@ export default {
                 },
             });
         },
+        getRelativeDate(date) {
+            return dayjs(date).fromNow();
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-#global-notifications-icon {
-    color: #ffffff;
-    float: right;
+#nofications {
     position: relative;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    background: #242526;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    &:hover {
-        background: #545557;
-    }
-    i {
-        font-size: 22px;
-        margin: auto;
-    }
-    .notification-dot {
-        width: 19px;
-        height: 19px;
+    #global-notifications-icon {
+        color: #ffffff;
+        float: right;
+        position: relative;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: rgb(255, 75, 75);
-        color: #fff;
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        font-size: 12px;
         display: flex;
-        .notification-counter {
+        background: #242526;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        &:hover {
+            background: #ffffff31;
+        }
+        i {
+            font-size: 22px;
             margin: auto;
-            line-height: 1;
-            font-weight: 700;
+        }
+        .notification-dot {
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background: rgb(255, 75, 75);
+            color: #fff;
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-size: 12px;
+            display: flex;
+            .notification-counter {
+                margin: auto;
+                line-height: 1;
+                font-weight: 700;
+            }
         }
     }
     #notification-dropdown {
         position: absolute;
         color: #fff;
-        top: 45px;
+        top: 43px;
         width: 300px;
         max-height: 600px;
+        min-height: 600px;
         overflow: auto;
-        border-radius: 3px;
+        border-radius: 10px;
         right: 0px;
         background: #242526;
         border: 1px solid rgba(255, 255, 255, 0.055);
-        box-shadow: 0px 2px 5px #0000003b;
-        padding: 15px;
+        box-shadow: 0px 8px 20px 0px #000000;
+        padding: 10px;
         .header {
             font-weight: 600;
             text-align: left;
@@ -141,21 +162,41 @@ export default {
             padding: 10px;
             text-align: left;
             position: relative;
-            border-radius: 10px;
+            border-radius: 7px;
+            font-size: 0.8em;
+            padding-right: 30px;
+            color: #ffffffab;
             cursor: pointer;
-
-            &:hover {
-                background: #545557;
+            float: left;
+            .name {
+                color: #fff !important;
+                font-weight: 600;
+                margin-right: 5px;
             }
-            .markasread-dot {
+            .date {
+                width: 100%;
+                float: left;
+                font-weight: 600;
+                color: #39b6ff;
+            }
+            &:hover {
+                background: #ffffff1c;
+            }
+            .mark-as-read-container {
                 position: absolute;
                 right: 10px;
-                top: 18px;
-                width: 15px;
-                height: 15px;
-                border-radius: 50%;
-                background: #8481ba;
-                cursor: pointer;
+                top: 0px;
+                height: 100%;
+                width: 20px;
+                display: flex;
+                .markasread-dot {
+                    margin: auto;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    background: #39b6ff;
+                    cursor: pointer;
+                }
             }
         }
     }

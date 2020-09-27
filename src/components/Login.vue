@@ -136,7 +136,7 @@ export default {
                 if (response.status == 200) {
                     const userData = await response.json();
                     localStorage.setItem("site_info", JSON.stringify(userData));
-                    this.$router.push("/dashboard");
+                    this.$router.push("/");
                 } else {
                     console.log("WRONG LOGIN");
                 }

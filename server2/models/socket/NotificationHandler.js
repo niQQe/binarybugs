@@ -1,20 +1,27 @@
 const ErrorHandler = require('./ErrorHandler');
 const EventMessage = require('./EventMessage');
-const { EXCLUDE_FIELDS } = require('./commonFieldExcludes');
 
-class FindByIdHandler {
+class NotificationHandler {
 	constructor(collections, eventBus, _id) {
 		this.collections = collections;
 		this.eventBus = eventBus;
 		this._id = _id;
 	}
 	async handle(message) {
-		if (message.payload.id) {
-			this._id = message.payload.id;
-		}
-	
 		try {
-			await this.collections[message.payload.collection].find({ [message.payload.key]: { $in: [this._id, null] } }).exec((err, res) => {
+			const { fullname } = await this.collections['User'].findOne({ _id: this._id });
+
+			const NEW_NOTIFICATION = new this.collections['Notification']({
+				value: message.payload.value,
+				fromId: this._id,
+				fromFullName: fullname,
+				toId: null,
+				date: new Date(),
+				read: false,
+				responseMessage: 'NEW_NOTIFICATION',
+			});
+
+			await NEW_NOTIFICATION.save((err, res) => {
 				if (!err) {
 					this.eventBus.next({
 						...new EventMessage({ res, message }),
@@ -31,6 +38,6 @@ class FindByIdHandler {
 	}
 }
 
-FindByIdHandler.TYPE = 'find-by-id';
+NotificationHandler.TYPE = 'new-notification';
 
-module.exports = FindByIdHandler;
+module.exports = NotificationHandler;

@@ -3,10 +3,10 @@ const Schema = mongoose.Schema;
 
 const notificationSchema = new Schema({
 	value: String,
-	toId:String,
 	fromId:String,
+	fromFullName:String,
+	toId:String,
 	date:String,
-	sender:Object,
 	read:Boolean
 });
 

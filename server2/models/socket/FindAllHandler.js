@@ -8,7 +8,6 @@ class FindAllHandler {
 		this.eventBus = eventBus;
 	}
 	async handle(message) {
-		console.log(message)
 		try {
 			await this.collections[message.payload.collection]
 				.find({}, { ...EXCLUDE_FIELDS })

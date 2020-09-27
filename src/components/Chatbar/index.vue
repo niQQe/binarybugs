@@ -12,7 +12,7 @@
         >
             <div class="chat">
                 <div class="user-container">
-                    <i class="mdi mdi-chat" style="color: #f3c442"></i>
+                    <i class="mdi mdi-chat" style="color: #39b6ff"></i>
 
                     <span class="user" @click="expandChat(index)">{{
                         chat.name
@@ -199,11 +199,11 @@ export default {
     align-items: flex-end;
     justify-content: flex-end;
     .chat-container {
-        background: #202225;
+        background: #242526;
         border-bottom: none;
         width: 300px;
-        height: 400px;
-        max-height: 400px;
+        height: 413px;
+        max-height: 413px;
         font-size: 1em;
         font-weight: 600;
         margin-left: 20px;
@@ -213,6 +213,7 @@ export default {
         transition: all 0.2s ease;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
+        box-shadow:0px 0px 7px 0px #000000;
         .chat {
             width: 100%;
             display: flex;
@@ -236,7 +237,7 @@ export default {
                     .chat-actions-btn {
                         width: 25px;
                         height: 25px;
-                        background: #ffffff2e;
+                        background: #3c3d3e;
                         display: flex;
                         border-radius: 20px;
                         cursor: pointer;
@@ -326,7 +327,7 @@ export default {
                 height: 50px;
                 width: 100%;
                 display: flex;
-                padding: 5px;
+                padding: 10px;
                 input {
                     background: #3a3b3c;
                     border: none;

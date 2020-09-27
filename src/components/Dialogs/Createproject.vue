@@ -1,5 +1,5 @@
 <template>
-    <div id="create-new-project-dialog">
+    <div id="dialog-cover">
         <div id="input-container">
             <label for="project">Project name</label>
             <input
@@ -39,6 +39,7 @@ export default {
         Button,
     },
     props: {
+        userId: String,
         socket: Object,
     },
     data: () => ({
@@ -55,45 +56,46 @@ export default {
         saveProject() {
             this.socket.emit("request", {
                 type: "save-one",
-                group:true,
+                group: true,
                 payload: {
-                    collection:'Project',
+                    collection: "Project",
                     responseMessage: "NEW_PROJECT",
-                    name:this.name,
+                    name: this.name,
+                    created: new Date(),
+                    createdBy: this.userId,
                 },
             });
+            this.socket.emit('request', {
+                type:'new-notification',
+                group:true,
+                payload:{
+                    collection:'Notification',
+                    responseMessage:'NEW_NOTIFICATION',
+                    value:`Created a new Project called ${this.name}`
+                }
+            })
         },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-#create-new-project-dialog {
-    position: absolute;
-    width: calc(100% - 260px);
-    height: 100%;
-    top: 0px;
-    left: 0px;
-    background: rgba(0, 0, 0, 0.616);
-    display: flex;
-    z-index: 200;
-    #input-container {
-        margin: auto;
-        width: 500px;
-        height: auto;
-        background: #242526;
-        border-radius: 10px;
-        padding: 15px 20px 20px 20px;
-        box-shadow: 0px 0px 18px #000;
-        label {
-            margin: 0px 0px 20px 0px;
-            color: #fff;
-        }
-        input {
-            width: 100%;
-            color: #fff;
-            font-size: 1.1em;
-        }
+#input-container {
+    margin: auto;
+    width: 500px;
+    height: auto;
+    background: #242526;
+    border-radius: 10px;
+    padding: 15px 20px 20px 20px;
+    box-shadow: 0px 0px 18px #000;
+    label {
+        margin: 0px 0px 20px 0px;
+        color: #fff;
+    }
+    input {
+        width: 100%;
+        color: #fff;
+        font-size: 1.2em !important;
     }
 }
 </style>

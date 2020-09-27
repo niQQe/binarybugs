@@ -8,7 +8,6 @@ class ChatHistoryHandler {
 		this._id = _id;
 	}
 	async handle(message) {
-        console.log(this._id)
 		try{
             await this.collections[message.payload.collection]
                 .find({ fromId: { $in: [this._id, message.payload.toId] }, toId: { $in: [this._id, message.payload.toId] } })

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const bugSchema = new Schema({
+	projectid:String,
 	id: String,
 	title: String,
 	reported_by: String,

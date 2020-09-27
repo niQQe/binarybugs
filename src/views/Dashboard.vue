@@ -2,34 +2,110 @@
     <div id="projects-container">
         <transition-group name="insert" tag="div">
             <div
-                v-for="(project, index) in projects"
+                v-for="project in projects"
                 class="project-container-wrapper"
-                :key="index"
+                :key="project.id"
             >
-                <div class="project-container">
-                    <span class="project-header">{{ project.name }}</span>
-                    <div style="padding:10px 0px;">
-                        <div
-                            class="project-stats-container"
-                            v-for="bug of project.bugs"
-                            :key="bug.category"
-                        >
+                <router-link
+                    class="project-container"
+                    :to="{ path: '/' + project.id }"
+                >
+                    <div class="project-header">
+                        <span>{{ project.name }}</span>
+                        <div class="action-container">
+                            <div
+                                class="add-bug-container"
+                                @click.prevent="
+                                    createBug(project.id, project.name)
+                                "
+                            >
+                                <span class="mdi mdi-plus"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding: 10px 0px">
+                        <div class="project-stats-container">
                             <div class="project-stat">
-                                <div class="project-stat-header">
-                                    {{ bug.category }}
-                                </div>
+                                <div class="project-stat-header">Critical</div>
 
                                 <div class="percentage-bar-container">
                                     <div
                                         class="percentage-bar"
-                                        :style="{ width: bug.percentage + '%' }"
+                                        :style="{
+                                            width: getPercentage(
+                                                project.critical.amount,
+                                                project.total
+                                            ),
+                                        }"
                                     ></div>
                                 </div>
-                                <span class="bug-amount">{{ bug.amount }}</span>
+                                <span class="bug-amount">{{
+                                    project.critical.amount
+                                }}</span>
+                            </div>
+                        </div>
+                        <div class="project-stats-container">
+                            <div class="project-stat">
+                                <div class="project-stat-header">Severe</div>
+
+                                <div class="percentage-bar-container">
+                                    <div
+                                        class="percentage-bar"
+                                        :style="{
+                                            width: getPercentage(
+                                                project.severe.amount,
+                                                project.total
+                                            ),
+                                        }"
+                                    ></div>
+                                </div>
+                                <span class="bug-amount">{{
+                                    project.severe.amount
+                                }}</span>
+                            </div>
+                        </div>
+                        <div class="project-stats-container">
+                            <div class="project-stat">
+                                <div class="project-stat-header">Easy</div>
+
+                                <div class="percentage-bar-container">
+                                    <div
+                                        class="percentage-bar"
+                                        :style="{
+                                            width: getPercentage(
+                                                project.easy.amount,
+                                                project.total
+                                            ),
+                                        }"
+                                    ></div>
+                                </div>
+                                <span class="bug-amount">{{
+                                    project.easy.amount
+                                }}</span>
+                            </div>
+                        </div>
+                        <div class="project-stats-container">
+                            <div class="project-stat">
+                                <div class="project-stat-header">NTH</div>
+
+                                <div class="percentage-bar-container">
+                                    <div
+                                        class="percentage-bar"
+                                        :style="{
+                                            width: getPercentage(
+                                                project.nth.amount,
+                                                project.total
+                                            ),
+                                        }"
+                                    ></div>
+                                </div>
+                                <span class="bug-amount">{{
+                                    project.nth.amount
+                                }}</span>
                             </div>
                         </div>
                     </div>
-                </div>
+                </router-link>
             </div>
         </transition-group>
     </div>
@@ -50,74 +126,64 @@ export default {
     }),
     mounted() {
         this.socket.emit("request", {
-            type: "find-all",
-            group: true,
+            type: "find-all-projects",
+            group: false,
             payload: {
                 responseMessage: "ALL_PROJECTS",
                 collection: "Project",
             },
         });
         this.socket.on("ALL_PROJECTS", ({ payload }) => {
-            for (let project of payload.data) {
-                project.bugs = [
-                    {
-                        category: "critical",
-                        amount: Math.floor((Math.random() * 7) + 1),
-                        percentage: 10,
-                    },
-                    {
-                        category: "Severe",
-                       amount: Math.floor((Math.random() * 10) + 1),
-                        percentage: 15,
-                    },
-                    {
-                        category: "Easy",
-                        amount: Math.floor((Math.random() * 15) + 1),
-                        percentage: 23,
-                    },
-                    {
-                        category: "NTH",
-                        amount: Math.floor((Math.random() * 25) + 1),
-                        percentage: 30,
-                    },
-                ];
-            }
             this.projects = payload.data;
         });
+
+        this.socket.on("NEW_BUG", ({ payload }) => {
+            for (let project of this.projects) {
+                if (project.id === payload.data.projectid) {
+                    project[payload.data.category].amount++;
+                    project.total++;
+                }
+            }
+            bus.$emit("close-dialog");
+        });
         this.socket.on("NEW_PROJECT", ({ payload }) => {
-            console.log("new");
             this.projects.push({
                 name: payload.data.name,
-                bugs: [
-                    {
-                        category: "critical",
-                        amount: 0,
-                        percentage: 0,
-                    },
-                    {
-                        category: "Severe",
-                        amount: 0,
-                        percentage: 0,
-                    },
-                    {
-                        category: "Easy",
-                        amount: 0,
-                        percentage: 0,
-                    },
-                    {
-                        category: "NTH",
-                        amount: 0,
-                        percentage: 0,
-                    },
-                ],
+                id: String(payload.data._id),
+                created: payload.data.created,
+                createdBy: payload.data.createdBy,
+                total: 0,
+                critical: {
+                    amount: 0,
+                    percentage: 0,
+                },
+                severe: {
+                    amount: 0,
+                    percentage: 0,
+                },
+                easy: {
+                    amount: 0,
+                    percentage: 0,
+                },
+                nth: {
+                    amount: 0,
+                    percentage: 0,
+                },
             });
             bus.$emit("close-dialog");
         });
     },
-    created() {
-        console.log(this.projects);
+    created() {},
+    methods: {
+        createBug(projectId, name) {
+            bus.$emit("show-create-new-bug-dialog", { projectId, name });
+        },
+        getPercentage(amount, total) {
+            const percentage = (amount / total) * 100;
+            if (isNaN(percentage)) return "0%";
+            return percentage + "%";
+        },
     },
-    methods: {},
 };
 </script>
 
@@ -142,7 +208,7 @@ export default {
             transition: all 0.2s ease;
             cursor: pointer;
             &:hover {
-                background: #2b2d2e;
+                background: #28292a;
             }
             .project-stats-container {
                 color: rgb(152, 152, 152);
@@ -158,10 +224,10 @@ export default {
                         font-size: 0.8em;
                         font-weight: 700;
                         letter-spacing: 0.05rem;
-                        min-width: 75px;
+                        min-width: 65px;
                     }
                     .percentage-bar-container {
-                        width: 60%;
+                        width: 63%;
                         height: 4px;
                         background: #3c3c3d;
                         margin-left: 10px;
@@ -173,6 +239,7 @@ export default {
                             height: 4px;
                             background: rgb(57, 182, 255);
                             float: left;
+                            transition: all 0.5s ease;
                         }
                     }
                     .bug-amount {
@@ -187,12 +254,29 @@ export default {
             .project-header {
                 width: 100%;
                 float: left;
+                display: flex;
                 padding: 0px 0px 10px 0px;
                 color: #d0d0d0;
                 font-size: 1em;
                 font-weight: 700;
                 letter-spacing: 0.02em;
-                border-bottom: 1px solid #9898981f;
+                .action-container {
+                    margin-left: auto;
+                    .add-bug-container {
+                        width: 25px;
+                        height: 25px;
+                        background: #3c3d3e;
+                        border-radius: 50%;
+                        display: flex;
+                        &:hover {
+                            background: #48494b;
+                        }
+                        span {
+                            margin: auto;
+                            color: #39b6ff;
+                        }
+                    }
+                }
             }
         }
     }

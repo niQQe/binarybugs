@@ -46,8 +46,8 @@ module.exports = {
 		try {
 			const token = signToken(req.user);
 			const { sub: user } = await decodeToken(token);
-			const { email, _id } = await User.findOne({ _id: user });
-			res.status(200).json({ token, email, _id });
+			const { email, _id, fullname } = await User.findOne({ _id: user });
+			res.status(200).json({ token, email, _id, fullname });
 		} catch (err) {
 			res.send('Error', err);
 		}

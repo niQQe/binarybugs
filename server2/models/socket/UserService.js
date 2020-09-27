@@ -1,17 +1,23 @@
 const { JWT_SECRET } = require('../../config');
 const { Subject } = require('rxjs');
 const jwt = require('jsonwebtoken');
+
+// MODELS
 const User = require('../schemas/user');
 const Message = require('../schemas/message');
 const Notification = require('../schemas/notification');
 const Project = require('../schemas/project');
+const Bug = require('../schemas/bug');
 
+// CLASSES
 const FindAllHandler = require('./FindAllHandler');
 const FindByIdHandler = require('./FindByIdHandler');
 const UpdateOneHandler = require('./UpdateOneHandler');
 const ChatHistoryHandler = require('./ChatHistoryHandler');
 const NewChatMessageHandler = require('./NewChatMessageHandler');
 const SaveOneHandler = require('./SaveOneHandler');
+const ProjectsHandler = require('./ProjectsHandler');
+const NotificationHandler = require('./NotificationHandler');
 
 const Handlers = require('./Handlers');
 
@@ -61,8 +67,6 @@ class UserService {
 
 				const eventBus = new Subject();
 				eventBus.subscribe((message) => {
-					console.log('EVENTBUS SUBSCRIBE');
-					console.log(message);
 					if (message.type !== 'error') {
 						if (message.group) {
 							this.io.to('all').emit(message.responseMessage, {
@@ -105,11 +109,13 @@ class UserService {
 
 				const handlers = new Handlers({
 					[FindAllHandler.TYPE]: new FindAllHandler({ User, Message, Notification, Project }, eventBus),
-					[FindByIdHandler.TYPE]: new FindByIdHandler({ User, Message, Notification }, eventBus, socket.user._id),
+					[FindByIdHandler.TYPE]: new FindByIdHandler({ User, Message, Notification, Bug }, eventBus, socket.user._id),
 					[UpdateOneHandler.TYPE]: new UpdateOneHandler({ User, Message, Notification }, eventBus, socket.user._id),
 					[ChatHistoryHandler.TYPE]: new ChatHistoryHandler({ Message }, eventBus, socket.user._id),
 					[NewChatMessageHandler.TYPE]: new NewChatMessageHandler({ Message, User }, eventBus, socket.user._id),
-					[SaveOneHandler.TYPE]: new SaveOneHandler({ Project, User, Notification }, eventBus, socket.user._id),
+					[SaveOneHandler.TYPE]: new SaveOneHandler({ Project, User, Notification, Bug }, eventBus, socket.user._id),
+					[ProjectsHandler.TYPE]: new ProjectsHandler({ Project, Bug }, eventBus, socket.user._id),
+					[NotificationHandler.TYPE]: new NotificationHandler({ Notification, User }, eventBus, socket.user._id),
 				});
 
 				socket.on('request', (message) => {

@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Dashboard from '@/views/Dashboard';
 import Login from '@/components/Login';
 import Home from '@/views/Home';
+import Project from '@/views/Project';
 import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
@@ -21,6 +22,11 @@ const routes = [
 				name: 'Dashboard',
 				path: '',
 				component: Dashboard,
+			},
+			{
+				name: 'project',
+				path: '/:id',
+				component: Project,
 			},
 		],
 	},
