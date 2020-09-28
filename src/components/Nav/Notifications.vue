@@ -107,8 +107,8 @@ export default {
         color: #ffffff;
         float: right;
         position: relative;
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         display: flex;
         background: #242526;
@@ -118,19 +118,19 @@ export default {
             background: #ffffff31;
         }
         i {
-            font-size: 22px;
+            font-size: 16px;
             margin: auto;
         }
         .notification-dot {
-            width: 19px;
-            height: 19px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
             background: rgb(255, 75, 75);
             color: #fff;
             position: absolute;
             top: -4px;
             right: -4px;
-            font-size: 12px;
+            font-size: 10px;
             display: flex;
             .notification-counter {
                 margin: auto;

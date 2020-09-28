@@ -35,6 +35,7 @@ export default {
     mounted() {
         this.socket.emit("request", {
             type: "find-all",
+            key: "_id",
             payload: {
                 responseMessage: "ALL_USERS",
                 collection: "User",
@@ -78,26 +79,19 @@ export default {
 
 <style lang="scss" scoped>
 #users {
-    width: 260px;
-    position: fixed;
-    right: 0px;
-    padding: 10px;
-    top: 0px;
-    z-index: 2;
-    height: 100%;
-    background: #242526;
-    box-shadow: -1px 0px 10px #00000087;
+    float:left;
+    width:100%;
+
+    padding-top:10px;
     .header {
-        font-weight: 700;
-        color: #b0b3b8;
-        padding: 5px 7px;
+        font-weight: 400;
+        color: #fff;
         margin-bottom: 10px;
     }
     .user-container {
         border-radius: 10px;
-        height: 50px;
-        padding: 4px 10px;
-        margin-bottom: 10px;
+        padding: 10px 10px;
+        margin-bottom: 5px;
         font-weight: 600;
         font-size: 0.9em;
         display: flex;
@@ -108,15 +102,15 @@ export default {
         cursor: pointer;
         .user-icon {
             background: rgba(57, 182, 255, 0.233);
-            width: 33px;
-            height: 33px;
+            width: 25px;
+            height: 25px;
             float: left;
             border-radius: 50%;
             display: flex;
             color: #fff;
             span {
                 margin: auto;
-                font-size: 1.5em;
+                font-size: 1.1em;
                 color: rgb(57, 182, 255);
             }
         }
@@ -132,19 +126,20 @@ export default {
 
         .user {
             margin-left: 10px;
-            font-size: 1.2em;
+            font-size: 1em;
             flex: 1;
+            font-weight:500;
         }
         .online {
             background: rgb(61, 202, 72);
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border-radius: 12px;
             position: absolute;
             margin-right: 5px;
             border: 2px solid #2f3136;
-            bottom: 3px;
-            left: 30px;
+            bottom: 6px;
+            left: 25px;
         }
         i {
             color: #f3c442;

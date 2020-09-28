@@ -1,12 +1,12 @@
 <template>
     <div id="main">
         <Nav :email="email" :socket="socket" :userId="userId" v-if="socket" />
-        <Users :socket="socket" :userId="userId" />
         <div id="main-router-content">
-            <transition name="fade" mode="out-in">
+            <transition name="fade-router" mode="out-in">
                 <router-view
                     :key="$route.fullPath"
                     :socket="socket"
+                    :currentProject="currentProject"
                 ></router-view>
             </transition>
         </div>
@@ -52,6 +52,7 @@ export default {
         createNewProjectDialog: false,
         createNewBugDialog: false,
         projectId: "",
+        currentProject:null
     }),
     mounted() {},
     created() {
@@ -73,6 +74,7 @@ export default {
                 token: JSON.parse(localStorage.getItem("site_info")).token,
             },
         });
+        bus.$on('project-name', this.setName)
     },
     watch: {},
     methods: {
@@ -87,6 +89,9 @@ export default {
             this.createNewProjectDialog = false;
             this.createNewBugDialog = false;
         },
+        setName(name){
+            this.currentProject = name
+        }
     },
 };
 </script>
@@ -101,20 +106,20 @@ export default {
     width: 100%;
     float: left;
     height: 100%;
-    padding-top: 60px;
-    padding-right: 260px;
+    padding-top: 48px;
+    padding-left: 251px;
     #main-router-content {
         float: left;
         width: 100%;
         height: 100%;
         position: relative;
-        padding: 20px;
+        padding: 0px 20px 20px 20px;
     }
 }
 
 #dialog-cover {
     position: absolute;
-    width: calc(100% - 260px);
+    width: calc(100%);
     height: 100%;
     top: 0px;
     left: 0px;

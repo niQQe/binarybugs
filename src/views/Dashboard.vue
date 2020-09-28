@@ -5,10 +5,12 @@
                 v-for="project in projects"
                 class="project-container-wrapper"
                 :key="project.id"
+                @click="getName(project.name)"
             >
                 <router-link
                     class="project-container"
                     :to="{ path: '/' + project.id }"
+                    
                 >
                     <div class="project-header">
                         <span>{{ project.name }}</span>
@@ -183,6 +185,10 @@ export default {
             if (isNaN(percentage)) return "0%";
             return percentage + "%";
         },
+        getName(name){
+            console.log('GETNAME')
+            bus.$emit('project-name', name)
+        }
     },
 };
 </script>
