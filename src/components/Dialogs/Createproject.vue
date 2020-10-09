@@ -1,15 +1,12 @@
 <template>
     <div id="dialog-cover">
         <div id="input-container">
-            <label for="project">Project name</label>
-            <input
-                ref="projectname"
-                v-model="name"
-                name="project"
-                type="text"
-                placeholder="Project name"
-                autofocus
-            />
+            <div class="header">Create new project</div>
+            <div class="group">
+                <input type="text" ref="projectname" required v-model="name" placeholder="  "/>
+                <span class="bar"></span>
+                <label>Project name</label>
+            </div>
             <Button
                 :text="'save'"
                 :type="'standard'"
@@ -54,26 +51,18 @@ export default {
             bus.$emit("close-dialog");
         },
         saveProject() {
-            this.socket.emit("request", {
+            this.$socket.emit({
                 type: "save-one",
                 group: true,
                 payload: {
                     collection: "Project",
-                    responseMessage: "NEW_PROJECT",
+                    storeAction: "setNewProject",
                     name: this.name,
                     created: new Date(),
                     createdBy: this.userId,
                 },
             });
-            this.socket.emit('request', {
-                type:'new-notification',
-                group:true,
-                payload:{
-                    collection:'Notification',
-                    responseMessage:'NEW_NOTIFICATION',
-                    value:`Created a new Project called ${this.name}`
-                }
-            })
+            this.closeDialog();
         },
     },
 };
@@ -86,16 +75,15 @@ export default {
     height: auto;
     background: #242526;
     border-radius: 10px;
-    padding: 15px 20px 20px 20px;
+    padding: 20px 20px 20px 20px;
     box-shadow: 0px 0px 18px #000;
-    label {
-        margin: 0px 0px 20px 0px;
+    .header {
+        margin: 0px 0px 40px 0px;
         color: #fff;
     }
     input {
         width: 100%;
         color: #fff;
-        font-size: 1.2em !important;
     }
 }
 </style>

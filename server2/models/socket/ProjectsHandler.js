@@ -6,6 +6,8 @@ class ProjectsHandler {
 		this.eventBus = eventBus;
 	}
 	async handle(message) {
+		console.log('I HaNDLER');
+		console.log(message);
 		try {
 			const SINGLE_PROJECTS = await this.collections[message.payload.collection].find({});
 			const SINGLE_BUGS = await this.collections['Bug'].find({});
@@ -20,40 +22,53 @@ class ProjectsHandler {
 					created: project.created,
 					createdBy: project.createdBy,
 					total: bugs.length,
-					critical: {
-						amount: this.findAmount(bugs, 'critical'),
-						percentage:0,
-					},
-					severe: {
-						amount: this.findAmount(bugs, 'severe'),
-						percentage: 0,
-					},
-					easy: {
-						amount: this.findAmount(bugs, 'easy'),
-						percentage: 0,
-					},
-					nth: {
-						amount: this.findAmount(bugs, 'nth'),
-						percentage: 0,
-					},
+					bugs: [
+						{
+							category: 'critical',
+							amount: this.findActiveBugsAmount(bugs, 'critical'),
+							percentage: 0,
+						},
+						{
+							category: 'severe',
+							amount: this.findActiveBugsAmount(bugs, 'severe'),
+							percentage: 0,
+						},
+						{
+							category: 'easy',
+							amount: this.findActiveBugsAmount(bugs, 'easy'),
+							percentage: 0,
+						},
+						{
+							category: 'nth',
+							amount: this.findActiveBugsAmount(bugs, 'nth'),
+							percentage: 0,
+						},
+						{
+							category: 'resolved',
+							amount: this.findResolvedBugsAmount(bugs),
+							percentage: 0,
+						},
+					],
 				});
 			}
 
+			const res = projects;
 			this.eventBus.next({
-				...new EventMessage({ res: projects, message }),
+				...new EventMessage(res, message),
 			});
 		} catch (err) {
 			console.log(err);
 		}
 	}
-	findAmount(bugs, category) {
-		const bugAmount = bugs.filter((bug) => bug.category == category);
+	findActiveBugsAmount(bugs, category) {
+		const bugAmount = bugs.filter((bug) => bug.category == category && !bug.resolved);
 		if (!bugAmount) return 0;
 		return bugAmount.length;
 	}
-	findAllAmounts(bugs){
-		// const amount = bugs.map(bug => bugs.amount)
-		// console.log(amount)
+	findResolvedBugsAmount(bugs) {
+		const bugAmount = bugs.filter((bug) => bug.resolved);
+		if (!bugAmount) return 0;
+		return bugAmount.length;
 	}
 }
 

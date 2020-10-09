@@ -74,12 +74,12 @@ class SocketConnection {
 					 */
 					this.io.emit('USER_OFFLINE', { id: socket.user._id });
 				});
-				socket.on('GET_ALL_USERS', async () => {
-					const ALL_USERS = await User.find({});
-					const ids = ALL_USERS.map((v) => v._id).filter((id) => id == String(socket.user._id));
-					const filteredUsers = ALL_USERS.filter((allUser) => !ids.includes(allUser._id));
+				socket.on('GET_GET_ALL_USERS', async () => {
+					const GET_ALL_USERS = await User.find({});
+					const ids = GET_ALL_USERS.map((v) => v._id).filter((id) => id == String(socket.user._id));
+					const filteredUsers = GET_ALL_USERS.filter((allUser) => !ids.includes(allUser._id));
 
-					this.io.to(socket.user.socketId).emit('ALL_USERS', filteredUsers);
+					this.io.to(socket.user.socketId).emit('GET_ALL_USERS', filteredUsers);
 				});
 				/**   Handles the new notification emitted by the user. */
 				socket.on('NEW_NOTIFICATION', async ({ value, toId, date }) => {

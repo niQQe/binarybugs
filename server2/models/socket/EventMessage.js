@@ -1,10 +1,8 @@
 class EventMessage {
-	constructor({ res, message }) {
-		console.log('EVENTMESSAGE')
-		console.log(res, message)
+	constructor(res, message) {
 		return {
 			status: 200,
-			responseMessage: message.payload.responseMessage,
+			storeAction: message.payload.storeAction,
 			group:message.group,
 			target: message.socketId,
 			recieved:message.payload,

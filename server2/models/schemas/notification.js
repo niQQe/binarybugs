@@ -6,8 +6,9 @@ const notificationSchema = new Schema({
 	fromId:String,
 	fromFullName:String,
 	toId:String,
-	date:String,
-	read:Boolean
+	created:String,
+	read:Boolean,
+	projectId:String
 });
 
 module.exports = mongoose.model('notifications', notificationSchema);

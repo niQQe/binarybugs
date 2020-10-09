@@ -12,16 +12,16 @@ class FindByIdHandler {
 		if (message.payload.id) {
 			this._id = message.payload.id;
 		}
-	
+
 		try {
 			await this.collections[message.payload.collection].find({ [message.payload.key]: { $in: [this._id, null] } }).exec((err, res) => {
 				if (!err) {
 					this.eventBus.next({
-						...new EventMessage({ res, message }),
+						...new EventMessage(res, message),
 					});
 				} else {
 					this.eventBus.next({
-						...new ErrorHandler({ err, message }),
+						...new ErrorHandler(err, message),
 					});
 				}
 			});

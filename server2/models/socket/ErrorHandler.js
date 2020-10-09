@@ -5,7 +5,7 @@ class ErrorHandler {
 		return {
 			type: 'error',
 			status: 400,
-			responseMessage: 'ERROR',
+			storeAction: 'ERROR',
 			target: message.target,
 			errorOutput: this.err,
 			recieved: this.message,

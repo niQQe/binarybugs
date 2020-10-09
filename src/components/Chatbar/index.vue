@@ -74,7 +74,6 @@ import { bus } from "@/main";
 export default {
     name: "chatbar",
     props: {
-        socket: Object,
         userId: String,
     },
     data: () => ({
@@ -86,57 +85,57 @@ export default {
         },
     },
     mounted() {
-        console.log(this.userId);
-        bus.$on("newActiveChat", (...args) => {
-            const [name, id] = args;
-            this.activateChat(name, id);
-        });
-        this.socket.on("NEW_CHAT_MESSAGE", ({ payload }) => {
-            //** CHECK IF CHAT EXISTS */
-            const MERGE_IDS = (fromId, toId) => [fromId, toId].sort().join``;
+        // console.log(this.userId);
+        // bus.$on("newActiveChat", (...args) => {
+        //     const [name, id] = args;
+        //     this.activateChat(name, id);
+        // });
+        // this.socket.on("NEW_CHAT_MESSAGE", ({ payload }) => {
+        //     //** CHECK IF CHAT EXISTS */
+        //     const MERGE_IDS = (fromId, toId) => [fromId, toId].sort().join``;
 
-            const INC_IDS = MERGE_IDS(
-                payload.data.fromId,
-                payload.data.toId
-            );
+        //     const INC_IDS = MERGE_IDS(
+        //         payload.data.fromId,
+        //         payload.data.toId
+        //     );
 
-            if (this.activeChats.length > 0) {
-                for (let chat of this.activeChats) {
-                    if (MERGE_IDS(chat.toId, chat.fromId) === INC_IDS) {
-                        chat.newChatMessage = true;
-                        chat.messages.push(payload.data);
-                    } else {
-                        this.activateChat(
-                            payload.data.fromFullName,
-                            payload.data.fromId
-                        );
-                    }
-                }
-            } else {
-                this.activateChat(
-                    payload.data.fromFullName,
-                    payload.data.fromId
-                );
-            }
-        });
-        this.socket.on("CHAT_HISTORY", (message) => {
-            console.log(message.recieved);
-            const CHAT_ALREADY_IN_ACTIVE_CHATS = this.activeChats.some(
-                (chat) => chat.toId === message.recieved.toId
-            );
+        //     if (this.activeChats.length > 0) {
+        //         for (let chat of this.activeChats) {
+        //             if (MERGE_IDS(chat.toId, chat.fromId) === INC_IDS) {
+        //                 chat.newChatMessage = true;
+        //                 chat.messages.push(payload.data);
+        //             } else {
+        //                 this.activateChat(
+        //                     payload.data.fromFullName,
+        //                     payload.data.fromId
+        //                 );
+        //             }
+        //         }
+        //     } else {
+        //         this.activateChat(
+        //             payload.data.fromFullName,
+        //             payload.data.fromId
+        //         );
+        //     }
+        // });
+        // this.socket.on("CHAT_HISTORY", (message) => {
+        //     console.log(message.recieved);
+        //     const CHAT_ALREADY_IN_ACTIVE_CHATS = this.activeChats.some(
+        //         (chat) => chat.toId === message.recieved.toId
+        //     );
 
-            if (!CHAT_ALREADY_IN_ACTIVE_CHATS) {
-                this.activeChats.unshift({
-                    name: message.recieved.name,
-                    toId: message.recieved.toId,
-                    fromId: message.recieved.fromId,
-                    message: "",
-                    messages: [...message.payload.data],
-                    minimized: false,
-                    newChatMessage: false,
-                });
-            }
-        });
+        //     if (!CHAT_ALREADY_IN_ACTIVE_CHATS) {
+        //         this.activeChats.unshift({
+        //             name: message.recieved.name,
+        //             toId: message.recieved.toId,
+        //             fromId: message.recieved.fromId,
+        //             message: "",
+        //             messages: [...message.payload.data],
+        //             minimized: false,
+        //             newChatMessage: false,
+        //         });
+        //     }
+        // });
     },
     methods: {
         sendChatMessage(id) {
@@ -148,7 +147,7 @@ export default {
                     type: "new-chat-message",
                     group:false,
                     payload: {
-                        responseMessage: "NEW_CHAT_MESSAGE",
+                        storeAction: "NEW_CHAT_MESSAGE",
                         toId: id,
                         message,
                     },
@@ -164,7 +163,7 @@ export default {
                     toId: id,
                     fromId: this.userId,
                     name,
-                    responseMessage: "CHAT_HISTORY",
+                    storeAction: "CHAT_HISTORY",
                     collection: "Message",
                 },
             });

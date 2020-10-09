@@ -11,24 +11,28 @@ class NotificationHandler {
 		try {
 			const { fullname } = await this.collections['User'].findOne({ _id: this._id });
 
+			const { socketUserId } = await this.collections['User'].findOne({ _id: message.payload.toId });
+
+
 			const NEW_NOTIFICATION = new this.collections['Notification']({
 				value: message.payload.value,
 				fromId: this._id,
 				fromFullName: fullname,
-				toId: null,
-				date: new Date(),
+				toId: message.payload.toId,
+				created: new Date(),
 				read: false,
-				responseMessage: 'NEW_NOTIFICATION',
+				projectId:message.payload.projectId
 			});
 
 			await NEW_NOTIFICATION.save((err, res) => {
 				if (!err) {
+					message.socketId = socketUserId;
 					this.eventBus.next({
-						...new EventMessage({ res, message }),
+						...new EventMessage(res, message),
 					});
 				} else {
 					this.eventBus.next({
-						...new ErrorHandler({ err, message }),
+						...new ErrorHandler(err, message),
 					});
 				}
 			});

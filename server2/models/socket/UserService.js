@@ -63,31 +63,33 @@ class UserService {
 				}
 			})
 			.on('connection', async (socket) => {
-				console.log('user connected');
+				console.log(socket.user.fullname + ' user connected');
 
 				const eventBus = new Subject();
 				eventBus.subscribe((message) => {
 					if (message.type !== 'error') {
 						if (message.group) {
-							this.io.to('all').emit(message.responseMessage, {
+							this.io.emit('UPDATE', {
 								type: message.payload.type,
+								storeAction: message.storeAction,
 								status: message.payload.status,
 								payload: message.payload,
 								recieved: message.recieved,
 							});
 						} else {
-							this.io.to(message.target).emit(message.responseMessage, {
-								type: message.payload.type,
-								status: message.payload.status,
+							this.io.to(message.target).emit('UPDATE', {
+								type: message.type,
+								storeAction: message.storeAction,
+								status: message.status,
 								payload: message.payload,
 								recieved: message.recieved,
 							});
 						}
 					} else {
-						this.io.to(message.target).emit(message.responseMessage, {
+						this.io.to(message.target).emit('UPDATE', {
 							type: message.type,
 							status: message.status,
-							responseMessage: 'ERROR',
+							storeAction: 'ERROR',
 							errorOutput: message.errorOutput,
 						});
 					}
@@ -105,12 +107,12 @@ class UserService {
 				 *  of the current user connected so that the status changes in
 				 *  real time.
 				 */
-				this.io.emit('USER_ONLINE', { id: socket.user._id });
+				this.io.emit('UPDATE', { storeAction: 'setUserOnline', payload: { id: socket.user._id } });
 
 				const handlers = new Handlers({
-					[FindAllHandler.TYPE]: new FindAllHandler({ User, Message, Notification, Project }, eventBus),
+					[FindAllHandler.TYPE]: new FindAllHandler({ User, Message, Notification, Project }, eventBus, socket.user._id),
 					[FindByIdHandler.TYPE]: new FindByIdHandler({ User, Message, Notification, Bug }, eventBus, socket.user._id),
-					[UpdateOneHandler.TYPE]: new UpdateOneHandler({ User, Message, Notification }, eventBus, socket.user._id),
+					[UpdateOneHandler.TYPE]: new UpdateOneHandler({ User, Message, Notification, Bug }, eventBus, socket.user._id),
 					[ChatHistoryHandler.TYPE]: new ChatHistoryHandler({ Message }, eventBus, socket.user._id),
 					[NewChatMessageHandler.TYPE]: new NewChatMessageHandler({ Message, User }, eventBus, socket.user._id),
 					[SaveOneHandler.TYPE]: new SaveOneHandler({ Project, User, Notification, Bug }, eventBus, socket.user._id),
@@ -119,6 +121,7 @@ class UserService {
 				});
 
 				socket.on('request', (message) => {
+					console.log(message)
 					handlers.handle({
 						...message,
 						socketId: socket.id,
@@ -136,7 +139,7 @@ class UserService {
 					 *  of the current user disconnected so that the status changes in
 					 *  real time.
 					 */
-					this.io.emit('USER_OFFLINE', { id: socket.user._id });
+					this.io.emit('UPDATE', {  storeAction: 'setUserOffline', payload: { id: socket.user._id, storeAction: 'setUserOffline' } });
 				});
 			});
 	}
