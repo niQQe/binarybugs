@@ -2,16 +2,17 @@
     <div id="projects-container">
         <div class="project-header">Projects</div>
         <div class="row">
-            <transition-group name="insert" tag="div">
+            
                 <div
                     v-for="project in GET_ALL_PROJECTS"
                     class="project-container-wrapper"
                     :key="project.id"
-                    @click="getName(project.name)"
                 >
                     <ProjectBox :project="project" />
+
+                
+                    
                 </div>
-            </transition-group>
         </div>
     </div>
 </template>

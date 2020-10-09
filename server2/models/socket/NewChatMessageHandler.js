@@ -18,9 +18,7 @@ class NewChatMessageHandler {
 			 */
 			const { socketUserId: toSocketUserId, fullname: toFullName } = await User.findOne({ _id: message.payload.toId });
 
-            const { socketUserId: fromSocketUserId, fullname: fromFullName } = await User.findOne({ _id: this._id });
-            
-
+			const { socketUserId: fromSocketUserId, fullname: fromFullName } = await User.findOne({ _id: this._id });
 
 			const NEW_CHAT_MESSAGE = new Message({
 				toFullName,
@@ -32,19 +30,19 @@ class NewChatMessageHandler {
 				userDate: dayjs(new Date()).format('MMM, DD, HH:mm:ss'),
 			});
 
-			await NEW_CHAT_MESSAGE.save((err, res, ) => {
+			await NEW_CHAT_MESSAGE.save((err, res) => {
 				if (!err) {
-                    message.socketId = toSocketUserId
-                    this.eventBus.next({
-						...new EventMessage({ res, message }),
-                    });
-                    message.socketId = fromSocketUserId
+					message.socketId = toSocketUserId;
 					this.eventBus.next({
-						...new EventMessage({ res, message }),
+						...new EventMessage(res, message),
+					});
+					message.socketId = fromSocketUserId;
+					this.eventBus.next({
+						...new EventMessage(res, message),
 					});
 				} else {
 					this.eventBus.next({
-						...new ErrorHandler({ err, message }),
+						...new ErrorHandler(err, message),
 					});
 				}
 			});

@@ -22,7 +22,6 @@ const bugSchema = new Schema({
 	comment: String,
 	resolved: Boolean,
 	created: String
-
 });
 
 module.exports = mongoose.model('bugs', bugSchema);

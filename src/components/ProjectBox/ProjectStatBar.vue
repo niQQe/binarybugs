@@ -1,20 +1,20 @@
 <template>
     <div
         class="project-stat"
-        :class="{ resolved: bug.category === 'resolved' }"
+        :class="{ resolved: category === 'resolved' }"
     >
-        <div class="project-stat-header">{{ bug.category }}</div>
+        <div class="project-stat-header">{{ category }}</div>
 
         <div class="percentage-bar-container">
             <div
                 class="percentage-bar"
-                :class="{ green: bug.category === 'resolved' }"
+                :class="{ green: category === 'resolved' }"
                 :style="{
-                    width: getPercentage(bug.amount, project.total),
+                    width: getPercentage(amount, totalBugAmount),
                 }"
             ></div>
         </div>
-        <span class="bug-amount">{{ bug.amount }}</span>
+        <span class="bug-amount">{{ amount }}</span>
     </div>
 </template>
 
@@ -22,8 +22,9 @@
 export default {
     name: "ProjectStatBar",
     props: {
-        bug: Object,
-        project: Object,
+        category:String,
+        amount: Number,
+        totalBugAmount: Number,
     },
     methods: {
         getPercentage(amount, total) {

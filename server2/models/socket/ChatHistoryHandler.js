@@ -15,11 +15,11 @@ class ChatHistoryHandler {
                     message.payload.fromId = this._id
                     if(!err){
                         this.eventBus.next({
-                            ...new EventMessage({ res, message })
+                            ...new EventMessage(res, message )
                         });
                     } else {
                         this.eventBus.next({
-                            ...new ErrorHandler({ err, message })
+                            ...new ErrorHandler( err, message )
                         });
                     }
                 });

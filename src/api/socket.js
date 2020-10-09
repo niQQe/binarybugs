@@ -13,7 +13,7 @@ export default class Socket {
 	initEmitListeners() {
 		this.socket.on('UPDATE', (message) => {
 			console.log(message);
-			this.store.dispatch(message.storeAction, message.payload);
+			this.store.dispatch(message.storeAction, { data: message.payload.data, recieved: message.recieved });
 		});
 	}
 	async emit(message) {

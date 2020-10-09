@@ -102,6 +102,14 @@ export default {
                 collection: "Notification",
             },
         });
+        this.$socket.emit({
+            type: "find-all",
+            group: false,
+            payload: {
+                storeAction: "setAllBugs",
+                collection: "Bug",
+            },
+        });
     },
 
     watch: {},

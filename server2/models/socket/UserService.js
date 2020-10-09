@@ -110,7 +110,7 @@ class UserService {
 				this.io.emit('UPDATE', { storeAction: 'setUserOnline', payload: { id: socket.user._id } });
 
 				const handlers = new Handlers({
-					[FindAllHandler.TYPE]: new FindAllHandler({ User, Message, Notification, Project }, eventBus, socket.user._id),
+					[FindAllHandler.TYPE]: new FindAllHandler({ User, Message, Notification, Project, Bug }, eventBus, socket.user._id),
 					[FindByIdHandler.TYPE]: new FindByIdHandler({ User, Message, Notification, Bug }, eventBus, socket.user._id),
 					[UpdateOneHandler.TYPE]: new UpdateOneHandler({ User, Message, Notification, Bug }, eventBus, socket.user._id),
 					[ChatHistoryHandler.TYPE]: new ChatHistoryHandler({ Message }, eventBus, socket.user._id),
